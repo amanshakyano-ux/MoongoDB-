@@ -7,6 +7,7 @@ const productRoutes = require("./routes/products");
 const userRoutes =require("./routes/users");
 const User = require("./models/users");
 const cartRoutes = require("./routes/carts");
+const orderRoutes = require("./routes/orders");
 const app = express();
 app.use(express.json());
 
@@ -26,7 +27,7 @@ app.use((req, res, next) => {
 app.use("/admin", productRoutes);
 app.use("/user",userRoutes)
 app.use("/cart", cartRoutes);
-
+app.use("/order", orderRoutes);
 app.use((err,req,res,next)=>{
   res.status(500).json({success:false,message:err.message || "Backend issue"})
 })
