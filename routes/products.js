@@ -8,7 +8,7 @@ const {
 } = require("../controller/products");
 
 const router = express.Router();
-
+console.log("products router loaded");
 router.post("/add-product", postAddProduct);
 router.get("/products", getProducts);
 router.get("/product/:id", getOneProduct);

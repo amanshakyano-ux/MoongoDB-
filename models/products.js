@@ -1,9 +1,11 @@
 const getDb = require("../utils/db-connection").getDb;
 const { ObjectId } = require("mongodb");
 class Product {
-  constructor(title, price) {
+  constructor(title, price, quantity, userId) {
     this.title = title;
     this.price = price;
+    this.quantity = quantity;
+    this.userId = userId;
   }
   save() {
     const db = getDb();

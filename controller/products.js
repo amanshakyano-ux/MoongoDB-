@@ -2,9 +2,9 @@ const Product = require("../models/products");
 
 const postAddProduct = async (req, res) => {
   try {
-    console.log("Post Api Hit");
-    const { name, price } = req.body;
-    const product = new Product(name, price);
+    const { name, price, quantity } = req.body;
+    const userId = req.user._id;
+    const product = new Product(name, price, quantity, userId);
     await product
       .save()
       .then((result) => {
@@ -51,6 +51,7 @@ const updateOneProduct = async (req, res) => {
     const updateData = {
       title: req.body.title,
       price: req.body.price,
+      quantity: req.body.quantity,
     };
     const product = await Product.updateProduct(id, updateData);
     res.send(product);

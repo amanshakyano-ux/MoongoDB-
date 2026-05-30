@@ -17,7 +17,7 @@ class User {
      )
      .catch(err=>{
       console.log(err)
-      throw err(err)
+      throw err(err.message)
      })
     
   }
