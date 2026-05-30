@@ -60,4 +60,21 @@ const getCart = async (req, res) => {
   }
 };
 
-module.exports = { addToCart, getCart };
+const removeItemFromCart = async(req,res,next)=>{
+  try{
+
+    const userId = req.user._id;
+    const { productId } = req.params;
+
+    
+
+    await Cart.removeItemFromCart(userId, productId);
+
+    res.status(200).json({ success: true, message: "Item removed from cart" });
+  } catch (err) {
+    console.log("Error in removeItemFromCart:", err);
+    next(err);
+  }
+}
+
+module.exports = { addToCart, getCart,removeItemFromCart };

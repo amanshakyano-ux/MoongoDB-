@@ -1,13 +1,10 @@
 const getDb = require("../utils/db-connection").getDb;
 const { ObjectId } = require("mongodb");
 
-function toObjectId(val) {
-  if (!val) throw new Error("userId/productId is required");
-  if (val instanceof ObjectId) return val;
-  if (typeof val === "string") return new ObjectId(val);
-  // val might be a document with _id
-  if (val && val._id) return val._id instanceof ObjectId ? val._id : new ObjectId(val._id);
-  return new ObjectId(val.toString());
+function toObjectId(id) {
+  return id instanceof ObjectId
+    ? id
+    : new ObjectId(id);
 }
 
 class Cart {
@@ -75,6 +72,53 @@ class Cart {
         throw err;
     })
   }
+
+  static async removeItemFromCart(userId, productId) {
+  const pid = toObjectId(productId);
+
+  const cart = await this.getCart(userId);
+
+  const updatedItems = cart.items.filter((item) => {
+    return item.productId.toString() !== pid.toString();
+  });
+
+  return this.updateCart(userId, updatedItems);
+}
+
+
+ static async removeItemFromCart(userId, productId) {
+  const db = getDb();
+
+  const uid = toObjectId(userId);
+  const pid = toObjectId(productId);
+
+    const cart = await this.getCart(userId);
+
+  const itemExists = cart.items.some((item) => {
+    return item.productId.toString() === pid.toString();
+  });
+
+  if (!itemExists) {
+    const error = new Error("Product not found in cart");
+    error.statusCode = 404;
+    throw error;
+  }
+
+  // 2. Product ko cart items se remove karo
+  const updatedItems = cart.items.filter((item) => {
+    return item.productId.toString() !== pid.toString();
+  });
+
+  // 3. Cart update karo
+  return db.collection("carts").updateOne(
+    { userId: uid },
+    {
+      $set: {
+        items: updatedItems,
+      },
+    }
+  );
+}
 }
 
 module.exports = Cart;
