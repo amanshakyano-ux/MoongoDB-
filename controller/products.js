@@ -2,9 +2,13 @@ const Product = require("../models/products");
 
 const postAddProduct = async (req, res) => {
   try {
-    const { name, price, quantity } = req.body;
-    const userId = req.user._id;
-    const product = new Product(name, price, quantity, userId);
+    const { title, price, quantity } = req.body;
+    // const userId = req.user._id;
+    const product = new Product({
+      title: title,
+      price: price,
+      quantity: quantity,
+    });
     await product
       .save()
       .then((result) => {
@@ -18,56 +22,98 @@ const postAddProduct = async (req, res) => {
   } catch (err) {
     res
       .status(500)
-      .json({ success: false, message: "Error from get Controller" });
+      .json({
+        success: false,
+        message: "Error from get Controller",
+        err: err.message,
+      });
   }
-};
+}
+
 
 const getProducts = async (req, res) => {
-  Product.fetchAll()
-    .then((products) => {
-      res.send(products);
-    })
-    .catch((err) => {
-      console.log(err);
-      return;
-    });
-};
-
-const getOneProduct = async (req, res) => {
   try {
-    const id = req.params.id;
-    const product = await Product.findById(id);
-    console.log(`Product ${product}`);
-    res.send(product);
+    const products = await Product.find();
+
+    res.status(200).json({
+      success: true,
+      products,
+    });
   } catch (err) {
-    console.log("Funtion err");
-    res.status(500).json({ success: false, message: err.message });
+    res.status(500).json({
+      success: false,
+      message: err.message,
+    });
   }
 };
 
-const updateOneProduct = async (req, res) => {
+const getOneProduct = async (req, res,next) => {
   try {
-    const id = req.params.id;
+    const pid = req.params.id;
+    const product = await Product.findById(pid);
+    if (!product) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Product not found" });
+    }
+    res.status(200).json({
+      success: true,
+      product,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+const updateOneProduct = async (req, res, next) => {
+  try {
+    const pid = req.params.id;
+
     const updateData = {
       title: req.body.title,
       price: req.body.price,
       quantity: req.body.quantity,
     };
-    const product = await Product.updateProduct(id, updateData);
-    res.send(product);
+
+    const updatedProduct = await Product.findByIdAndUpdate(
+      pid,
+      updateData,
+      { new: true }
+    );
+
+    if (!updatedProduct) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Product updated successfully",
+      product: updatedProduct,
+    });
   } catch (err) {
-    console.log("updateFuncError");
-    res.status(500).json({ success: false, message: err.message });
+    next(err);
   }
 };
-const deleteOneProduct = async (req, res) => {
+const deleteOneProduct = async (req, res,next) => {
   try {
-    const id = req.params.id;
-    const result = await Product.deleteProduct(id);
-    res.send(result);
+    const pid = req.params.id;
+    const result = await Product.findByIdAndDelete(pid);
+    if (!result) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found"
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Product deleted successfully"
+    });
   } catch (err) {
-    console.log("delete FUn Error");
-    res.status(500).json({ success: false, message: err.message });
+    next(err);
   }
 };
 module.exports = {
