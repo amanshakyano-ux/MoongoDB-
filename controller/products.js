@@ -1,4 +1,5 @@
 const Product = require("../models/products")
+
 const  postAddProduct= async(req,res)=>{
 try{
     console.log("Post Api Hit")
@@ -21,10 +22,65 @@ try{
 }
 }
 
-// const  getAddProduct = async()=>{
-// console.log("POST api hit")
-// }
+const  getProducts = async(req,res)=>{
+    Product.fetchAll()
+    .then(products=>{
+        res.send(products)
+    })
+    .catch(err=>{
+        console.log(err)
+        return;
+    })
+}
 
+const getOneProduct = async(req,res)=>{
+    try{
+        const id = req.params.id;
+      const product = await  Product.findById(id)
+      console.log(`Product ${product}`)
+      res.send(product)
+    }catch(err)
+    {
+        console.log("Funtion err")
+        res.status(500).json({success:false,message:err.message})
+    }
+}
+
+const updateOneProduct= async(req,res)=>
+{
+    try{
+        const id = req.params.id;
+        const updateData = {
+            title:req.body.title,
+            price:req.body.price
+        }
+        const product = await  Product.updateProduct(id,updateData)
+        res.send(product)
+
+
+    }catch(err)
+    {
+         console.log("updateFuncError")
+        res.status(500).json({success:false,message:err.message})
+    }
+}
+const deleteOneProduct = async(req,res)=>{
+    try{
+
+      const id = req.params.id;
+      const result = await Product.deleteProduct(id)
+       res.send(result)
+
+    }catch(err)
+    {
+        console.log("delete FUn Error")
+        res.status(500).json({success:false,message:err.message})
+    }
+}
 module.exports = {
-    postAddProduct
+    postAddProduct,
+    getProducts,
+    getOneProduct,
+    updateOneProduct,
+    deleteOneProduct
 }
