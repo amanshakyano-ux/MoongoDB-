@@ -20,7 +20,7 @@ const userSchema = new Schema({
       {
         productId: {
           type: Schema.Types.ObjectId,
-          ref: "product",
+          ref: "Product",
           required: true,
         },
         quantity: {
@@ -54,5 +54,11 @@ userSchema.methods.removeItemFromCart = async function (productId) {
   );
   return this.save();
 };
+
+userSchema.methods.clearCart = async function(){
+  this.cart.items = [];
+  return this.save();
+
+}
 module.exports = mongoose.model("User", userSchema);
 
