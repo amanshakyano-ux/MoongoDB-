@@ -5,24 +5,24 @@ const express = require("express");
 const mongoConnect = require("./utils/db-connection");
 const productRoutes = require("./routes/products");
 const userRoutes = require("./routes/users");
-// const User = require("./models/users");
+const User = require("./models/users");
 const cartRoutes = require("./routes/carts");
 const orderRoutes = require("./routes/orders");
 const app = express();
 app.use(express.json());
 
-// app.use((req, res, next) => {
-//   User.getUserById("6a1af20224ea85865a3a5924")
-//   .then(user => {
-//     req.user = user;
-//     console.log('auth-middleware: attached req.user._id =', user && user._id);
-//     next();
-//   })
-//   .catch(err => {
-//     console.log('auth-middleware error:', err && err.message);
-//     next(err);
-//   });
-// });
+app.use((req, res, next) => {
+  User.findOne({ _id: "6a1bcf3aac5b1c56e4bd07d6" })
+  .then(user => {
+    req.user = user;
+    console.log('auth-middleware: attached req.user._id =', user && user._id);
+    next();
+  })
+  .catch(err => {
+    console.log('auth-middleware error:', err && err.message);
+    next(err);
+  });
+});
 
 app.use("/products", productRoutes);
 app.use("/user", userRoutes);
