@@ -62,12 +62,12 @@ const getCart = async (req, res) => {
 const removeItemFromCart = async(req,res,next)=>{
   try{
 
-    const userId = req.user._id;
+    
     const { productId } = req.params;
 
-    
+    const user = req.user
 
-    await Cart.removeItemFromCart(userId, productId);
+    await req.user.removeItemFromCart(productId);
 
     res.status(200).json({ success: true, message: "Item removed from cart" });
   } catch (err) {

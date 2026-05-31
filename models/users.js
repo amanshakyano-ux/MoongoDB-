@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
- 
+
 const userSchema = new Schema({
   name: {
     type: String,
@@ -47,4 +47,12 @@ userSchema.methods.addToCart = async function (product) {
 
   return this.save();
 };
+
+userSchema.methods.removeItemFromCart = async function (productId) {
+  this.cart.items = this.cart.items.filter(
+    (item) => item.productId.toString() !== productId.toString(),
+  );
+  return this.save();
+};
 module.exports = mongoose.model("User", userSchema);
+
