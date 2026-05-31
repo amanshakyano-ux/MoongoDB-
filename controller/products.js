@@ -27,9 +27,9 @@ const postAddProduct = async (req, res, next) => {
 
 const getProducts = async (req, res, next) => {
   try {
-    const products = await Product.find()
-          // .select("title price quantity -_id")
-          // .populate("userId","name email");
+    const products = await Product.find();
+    // .select("title price quantity -_id")
+    // .populate("userId","name email");
 
     res.status(200).json({
       success: true,
@@ -39,8 +39,6 @@ const getProducts = async (req, res, next) => {
     next(err);
   }
 };
-
- 
 
 const getOneProduct = async (req, res, next) => {
   try {

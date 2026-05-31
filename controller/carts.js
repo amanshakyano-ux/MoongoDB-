@@ -1,6 +1,6 @@
 const Cart = require("../models/carts");
-
-const addToCart = async (req, res) => {
+const Product = require("../models/products");
+const addToCart = async (req, res,next) => {
   try {
     // prefer authenticated user from middleware, fall back to body
     let userId = req.user && req.user._id ? req.user._id : req.body.userId;
@@ -16,11 +16,13 @@ const addToCart = async (req, res) => {
       return res.status(400).json({ success: false, message: "productId missing" });
     }
 
-    console.log("addToCart called with", { userId: userId.toString ? userId.toString() : userId, productId });
+    const product = await Product.findById(productId);
+    if (!product) {
+      console.log("addToCart: product not found", { productId });
+      return res.status(404).json({ success: false, message: "Product not found" });
+    }
+    const result = await req.user.addToCart(product);
 
-    const result = await Cart.addProduct(userId, productId);
-
-    console.log("addToCart result", result && result.acknowledged ? "insert/update ok" : result);
 
     res.status(200).json({
       success: true,
@@ -30,10 +32,7 @@ const addToCart = async (req, res) => {
   } catch (err) {
     console.log("Error in addToCart:", err);
 
-    res.status(500).json({
-      success: false,
-      message: err.message,
-    });
+    next(err);
   }
 };
 
